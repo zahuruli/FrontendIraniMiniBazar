@@ -21,7 +21,7 @@ const SuperShopLogin = () => {
       toast.error("Username and password are required");
       return;
     }
-    localStorage.setItem("username", userName);
+    localStorage.setItem(userName);
     // Perform authentication or other login logic here
     // For demo purposes, navigate to home page directly
     navigate("/home", {

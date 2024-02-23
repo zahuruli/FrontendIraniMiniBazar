@@ -62,7 +62,7 @@ const PurchaseOperation = () => {
   const [product_trace_id, setProductTraceId] = useState("");
   const [payment_id, setPaymentId] = useState("");
 
- const Employee = localStorage.getItem("username")
+  const Employee = localStorage.getItem("username");
 
   const newWidth = {
     width: "7.vw",
@@ -332,7 +332,7 @@ const PurchaseOperation = () => {
   //   setPaid("")
   //   setTabledata([])
   //   setSaveData([])
-    
+
   // };
 
   const AddToCart = () => {
@@ -416,7 +416,6 @@ const PurchaseOperation = () => {
   //all save api
 
   const handleSave = async () => {
-    
     try {
       const response = await axios.post(
         "https://backendofsupershoppos.onrender.com/api/transactionsRouter/postTransactionFromAnyPageBulk",
@@ -431,28 +430,28 @@ const PurchaseOperation = () => {
       if (response.status === 200) {
         console.log(response.data);
         setSaveData([]);
-        setTabledata([])
-        setPaid("")
-        setVat("")
-        
+        setTabledata([]);
+        setPaid("");
+        setVat("");
+
         toast.success("Data saved successfully!");
       } else {
         toast.error("Failed to save data");
         setSaveData([]);
-        setTabledata([])
-        setPaid("")
-        setVat("")
+        setTabledata([]);
+        setPaid("");
+        setVat("");
       }
     } catch (error) {
       console.error(error);
       toast.error("Failed to save data. Please try again later");
       setSaveData([]);
-      setTabledata([])
-      setPaid("")
-      setVat("")
+      setTabledata([]);
+      setPaid("");
+      setVat("");
     }
   };
- console.log(brandID);
+  console.log(brandID);
 
   const addTransaction = useCallback(async () => {
     const newTransactions = tableData.map((item) => ({
@@ -477,16 +476,27 @@ const PurchaseOperation = () => {
       shop_name_id: 1,
     }));
     setSaveData((prevSaveData) => [...prevSaveData, ...newTransactions]);
-    
-  }, [tableData, invoice, product_trace_id, brandID, vatID, NettotalAmount, supplierNameID, formattedDate, payment_id, paid, Employee]);
+  }, [
+    tableData,
+    invoice,
+    product_trace_id,
+    brandID,
+    vatID,
+    NettotalAmount,
+    supplierNameID,
+    formattedDate,
+    payment_id,
+    paid,
+    Employee,
+  ]);
 
   useEffect(() => {
     const saveDataNotEmpty = saveData.length > 0;
     if (saveDataNotEmpty && supplierNameID) {
       handleSave();
     }
-   
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saveData, supplierNameID]);
 
   const handleButtonClick = async () => {
@@ -565,14 +575,12 @@ const PurchaseOperation = () => {
 
   const handlePaidChange = (e) => {
     const newPaid = parseFloat(e.target.value);
-    
-    if (newPaid > NettotalAmount  ) {
+
+    if (newPaid > NettotalAmount) {
       toast.warning("Paid amount cannot exceed Net Total.");
-    }
-    else if(newPaid <0){
+    } else if (newPaid < 0) {
       toast.warning("Paid amount cannot Decrease 0.");
-    }
-    else{
+    } else {
       setPaid(newPaid);
     }
   };
@@ -903,16 +911,13 @@ const PurchaseOperation = () => {
                       </option>
                     ))}
                   </select>
-                  
+
                   <button className="supplier_add_button" onClick={showModal}>
                     +
                   </button>
-                  <div
-                      className="error_message_supllier"
-                     
-                    >
-                      {error && supplierName === "" ? error : ""}
-                    </div>
+                  <div className="error_message_supllier">
+                    {error && supplierName === "" ? error : ""}
+                  </div>
                 </div>
                 <div className="input_field_long">
                   <label className="label_field_supershop_purchase">
@@ -1023,7 +1028,6 @@ const PurchaseOperation = () => {
                     Employee
                   </label>
                   <select>
-
                     <option>{Employee}</option>
                   </select>
                 </div>

@@ -25,7 +25,7 @@ const SalePage = () => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
-  const Employee = localStorage.setItem("username");
+  const Employee = localStorage.setItem("usename");
   const [contributor_name, setContributorName] = useState("");
   const [address, setAddress] = useState("");
   const [mobile, setMobile] = useState("");
