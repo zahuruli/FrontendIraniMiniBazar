@@ -25,7 +25,7 @@ const SalePage = () => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
-  const Employee = localStorage.getItem("username");
+  const Employee = localStorage.setItem("username");
   const [contributor_name, setContributorName] = useState("");
   const [address, setAddress] = useState("");
   const [mobile, setMobile] = useState("");
@@ -393,7 +393,7 @@ const SalePage = () => {
       payment_type_id: payment_id,
       shop_name_id: shopNameData.map((data) => data.shop_name_id),
       paid: paid,
-      employee_id: 1,
+      employee_id: Employee,
       sale_price: item.sale_price,
       discount: "None",
       purchase_price: 0,

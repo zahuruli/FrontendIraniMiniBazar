@@ -2,16 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./AddProduct.module.css";
 import { BsFillFileEarmarkExcelFill } from "react-icons/bs";
 import { IoReloadCircleOutline } from "react-icons/io5";
-import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { BiBarcodeReader } from "react-icons/bi";
 import { IoIosSave } from "react-icons/io";
-import { FaEdit } from "react-icons/fa";
 import { MdAddBox } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { FaArrowRotateRight, FaArrowLeft } from "react-icons/fa6";
-import { GiCancel } from "react-icons/gi";
 import { IoMdPhotos } from "react-icons/io";
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
 import toast, { Toaster } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import ComponentToPrint from "./BarCode";
@@ -21,7 +17,7 @@ import exportFromJSON from "export-from-json";
 const Addproducts = () => {
   const BASE_URL = process.env.REACT_APP_BASE_URL;
   const [items, setItems] = useState([]);
-  const [fixedItems, setFixedItems] = useState([]);
+  const [setFixedItems] = useState([]);
 
   //categories
   const [categories, setCategories] = useState([]);
