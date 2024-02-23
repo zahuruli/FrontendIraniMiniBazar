@@ -393,7 +393,7 @@ const SalePage = () => {
       payment_type_id: payment_id,
       shop_name_id: shopNameData.map((data) => data.shop_name_id),
       paid: paid,
-      employee_id: Employee,
+      employee_id: 1,
       sale_price: item.sale_price,
       discount: "None",
       purchase_price: 0,
