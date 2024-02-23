@@ -27,11 +27,8 @@ const SuperShopLogin = () => {
       try {
         navigate("/home", {
           state: {
-            id: 1,
             username: userName,
             password: password,
-            email: "abc@yourgmail.com",
-            roles: "admin",
           },
         });
       } catch (error) {
