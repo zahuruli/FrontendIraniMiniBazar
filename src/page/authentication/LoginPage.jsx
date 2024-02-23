@@ -17,7 +17,7 @@ const SuperShopLogin = () => {
     event.preventDefault();
 
     localStorage.setItem("username", userName);
-    if (!userName.trim() || !password.trim()) {
+    if (!userName && !password) {
       toast.error("Username and password are required");
       return;
     }
