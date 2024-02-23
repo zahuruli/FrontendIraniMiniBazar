@@ -15,13 +15,13 @@ const SuperShopLogin = () => {
 
   const handleFromSignIn = (event) => {
     event.preventDefault();
-    localStorage.getItem(userName);
+
     // Perform input validation
     if (!userName.trim() || !password.trim()) {
       toast.error("Username and password are required");
       return;
     }
-
+    localStorage.setItem("username", userName);
     // Perform authentication or other login logic here
     // For demo purposes, navigate to home page directly
     navigate("/home", {
