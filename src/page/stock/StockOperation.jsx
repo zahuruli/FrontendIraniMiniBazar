@@ -7,7 +7,8 @@ import Excel from "../../image/excel.webp";
 import invoiceimg from "../../image/Invoice.png";
 import reset from "../../image/reset.png";
 import { ToastContainer, toast } from "react-toastify";
-
+import * as FileSaver from "file-saver";
+import XLSX from "sheetjs-style";
 const StockOperation = () => {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [selectedProductCode, setSelectedProductCode] = useState("");
@@ -48,7 +49,7 @@ const StockOperation = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        "https://backendofsupershoppos.onrender.com/api/transactionsRouter/getAllTransactions"
+        "http://194.233.87.22:5003/api/transactionsRouter/getAllTransactions"
       );
 
       const filteredTransactions = response.data.filter(
@@ -104,11 +105,8 @@ const StockOperation = () => {
     
         // Push the calculated available quantity to the array
         availableQuantities.push({ product_code, availableQuantity });
-        
       });
     
-      // Update the state with the updated rows array
-      
       return availableQuantities;
     };
     
@@ -118,12 +116,12 @@ const StockOperation = () => {
     
     
   },[SaleQuantity, rows])
-console.log("rows", avilableQunaitty);
+console.log(avilableQunaitty);
   const fetchProductData = async () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        "https://backendofsupershoppos.onrender.com/api/producttraces/getAll"
+        "http://194.233.87.22:5003/api/producttraces/getAll"
       );
 
       if (response.data) {
@@ -154,7 +152,7 @@ console.log("rows", avilableQunaitty);
       toast.warning("Plaese filup serach Input");
       return;
     }
-    const results = aggregatedRows.filter((item) =>
+    const results = rows.filter((item) =>
       item.ProductTrace.name
         .toLowerCase()
         .includes(selectedProduct.toLowerCase())
@@ -163,10 +161,10 @@ console.log("rows", avilableQunaitty);
     if (results.length === 0) {
       setFilteredData([]);
       toast.warning("Not Matching any data");
-      console.log("iifdsf");
+    
     } else {
       setFilteredData(results);
-      console.log(results);
+      
     }
   };
 
@@ -175,18 +173,18 @@ console.log("rows", avilableQunaitty);
       toast.warning("Plaese filup serach Input");
       return;
     }
-    const results = aggregatedRows.filter((item) =>
+    const results = rows.filter((item) =>
       item.ProductTrace.product_code
         
         .includes(selectedProductCode)
     );
     if (results.length === 0) {
       setFilteredData([]);
-      
+      setRows([])
       toast.warning("Not Matching any data");
     } else {
       setFilteredData(results);
-      console.log("hi");
+      
     }
   };
 
@@ -221,22 +219,26 @@ console.log("rows", avilableQunaitty);
       setTotalQuanityt(0);
     }
   }, [rows]);
-
-  const aggregatedRows = rows.reduce((result, item) => {
-    const existingItem = result.find((r) => r.ProductTrace?.product_code === item.ProductTrace?.product_code);
-  
-    if (existingItem) {
-      // If the product code already exists, update the quantity
-      existingItem.quantity_no += item.quantity_no;
-    } else {
-      // If the product code doesn't exist, add the item to the result array
-      result.push({ ...item });
-    }
-  
-    return result;
-  }, []);
-
-  const totalAvailableQuantity = avilableQunaitty.reduce((sum, item) => sum + item.availableQuantity, 0);
+  const formattedTransactions = rows.map((item, index) => ({
+    Serial: index + 1,
+    product_code: item.ProductTrace?.product_code,
+    name: item.ProductTrace?.name,
+    type: item.ProductTrace?.type,
+    warranty: item.warranty,
+    quantity: item.quantity_no,
+    sale_price: item.sale_price,
+    unit: item.Unit.unit
+  }));
+  const fileType =
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+const fileExtension = ".xlsx";
+  const exportToExcel = async (excelData,fileName) => {
+    const ws = XLSX.utils.json_to_sheet(excelData);
+    const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: fileType });
+    FileSaver.saveAs(data, fileName + fileExtension);
+  };
   return (
     <>
     <ToastContainer/>
@@ -310,54 +312,42 @@ console.log("rows", avilableQunaitty);
                 <th>Unit</th>
               </tr>
               <tbody>
-  {FilteredData.length > 0
-    ? FilteredData.map((item, index) => (
-        <tr
-          className="row_sale_expense_report_page"
-          tabIndex="0"
-          key={item.index}
-        >
-          {/* Other columns */}
-          <td>{index + 1}</td>
-          <td>{item.ProductTrace?.product_code}</td>
-          <td>{item.ProductTrace?.name}</td>
-          <td>{item.ProductTrace?.type}</td>
-          <td>{item.warranty}</td>
-          <td>{item.quantity_no}</td>
-          <td>{item.sale_price}</td>
-          <td>{item.Unit.unit}</td>
-          {/* Display the available quantity */}
-          <td>{/* Add available quantity here */}</td>
-        </tr>
-      ))
-    : aggregatedRows &&
-    aggregatedRows.map((item, index) => {
-        const availableQuantity = avilableQunaitty.find(
-          (qty) => qty.product_code === item.ProductTrace?.product_code
-        );
-
-        return (
-          <tr
-            className="row_sale_expense_report_page"
-            tabindex="0"
-            key={item.index}
-            onClick={() => handlerow(item, index)}
-          >
-            {/* Other columns */}
-            <td>{index + 1}</td>
-            <td>{item.ProductTrace?.product_code}</td>
-            <td>{item.ProductTrace?.name}</td>
-            <td>{item.ProductTrace?.type}</td>
-            <td>{item.warranty}</td>
-            <td>{item.quantity_no}</td>
-            <td>{availableQuantity ? availableQuantity.availableQuantity : '-'}</td>
-            <td>{item.Unit.unit}</td>
-            {/* Display the available quantity */}
-           
-          </tr>
-        );
-      })}
-</tbody>
+                {FilteredData.length > 0
+                  ? FilteredData.map((item, index) => (
+                      <tr
+                        className="row_sale_expense_report_page"
+                        tabIndex="0"
+                        key={item.index}
+                      >
+                        <td>{index + 1}</td>
+                        <td>{item.ProductTrace?.product_code}</td>
+                        <td>{item.ProductTrace?.name}</td>
+                        <td>{item.ProductTrace?.type}</td>
+                        <td>{item.warranty}</td>
+                        <td>{item.quantity_no}</td>
+                        <td>{item.sale_price}</td>
+                        <td>{item.Unit.unit}</td>
+                      </tr>
+                    ))
+                  : rows &&
+                    rows.map((item, index) => (
+                      <tr
+                        className="row_sale_expense_report_page"
+                        tabindex="0"
+                        key={item.index}
+                        onClick={() => handlerow(item,index)}
+                      >
+                        <td>{index + 1}</td>
+                        <td>{item.ProductTrace?.product_code}</td>
+                        <td>{item.ProductTrace?.name}</td>
+                        <td>{item.ProductTrace?.type}</td>
+                        <td>{item.warranty}</td>
+                        <td>{item.quantity_no}</td>
+                        <td>{item.sale_price}</td>
+                        <td>{item.Unit.unit}</td>
+                      </tr>
+                    ))}
+              </tbody>
             </table>
           )}
         </div>
@@ -468,7 +458,7 @@ console.log("rows", avilableQunaitty);
                 View & add Image
               </button>
               <div className="container_update_column2_stock_button_excel">
-                <button>
+                <button onClick={()=>exportToExcel(formattedTransactions,"Stock Report")}>
                   <img src={Excel} alt="" />
                 </button>
                 Excel
@@ -489,7 +479,6 @@ console.log("rows", avilableQunaitty);
                 <label> Total Avilable Quantity</label>
                 <input
                   disabled
-                  value={totalAvailableQuantity}
                   
                 />
               </div>

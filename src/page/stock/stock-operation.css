@@ -47,6 +47,7 @@
   
   .third_row_div_stock_operation {
     box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+
     border-radius: 2vh;
     transition: 0.5s;
     padding: 0.5vw;
@@ -214,7 +215,7 @@
     background-color: rgba(136, 179, 154, 1);
   }
   
- .table_wrapper_stock_operation table th {
+  th {
     position: sticky;
     top: 0;
     background: rgba(6, 52, 27, 1);

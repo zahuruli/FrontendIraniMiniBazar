@@ -2,12 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import styles from "./AddProduct.module.css";
 import { BsFillFileEarmarkExcelFill } from "react-icons/bs";
 import { IoReloadCircleOutline } from "react-icons/io5";
+import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { BiBarcodeReader } from "react-icons/bi";
 import { IoIosSave } from "react-icons/io";
+import { FaEdit } from "react-icons/fa";
 import { MdAddBox } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { FaArrowRotateRight, FaArrowLeft } from "react-icons/fa6";
+import { GiCancel } from "react-icons/gi";
 import { IoMdPhotos } from "react-icons/io";
-import { Modal } from "antd";
+import { Button, Modal } from "antd";
 import toast, { Toaster } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import ComponentToPrint from "./BarCode";
@@ -15,8 +19,8 @@ import axios from "axios";
 import exportFromJSON from "export-from-json";
 
 const Addproducts = () => {
+  const BASE_URL = process.env.REACT_APP_BASE_URL;
   const [items, setItems] = useState([]);
-  // eslint-disable-next-line no-unused-vars
   const [fixedItems, setFixedItems] = useState([]);
 
   //categories
@@ -59,7 +63,7 @@ const Addproducts = () => {
         setFixedItems(JSON.parse(productData));
       } else {
         const response = await axios.get(
-          "https://backendofsupershoppos.onrender.com/api/producttraces/getAll"
+          `${BASE_URL}/api/producttraces/getAll`
         );
         setItems(response.data);
         setFixedItems(response.data);
@@ -73,7 +77,7 @@ const Addproducts = () => {
 
   useEffect(() => {
     fetchAllProducts();
-    document.title = "Add Product"
+    document.title = "Add Product";
     // return () => sessionStorage.removeItem("productData");
   }, []);
 
@@ -81,9 +85,7 @@ const Addproducts = () => {
   //get all category:
   const fetchAllCategory = async () => {
     try {
-      const { data } = await axios.get(
-        "https://backendofsupershoppos.onrender.com/api/category/getAll"
-      );
+      const { data } = await axios.get(`${BASE_URL}/api/category/getAll`);
       setCategories(data);
     } catch (error) {
       console.log(error);
@@ -103,6 +105,7 @@ const Addproducts = () => {
       } else {
         console.log("Selected category not found for value:", value);
       }
+      console.log("selectedCategory", selectedCategory);
     } else {
       console.log("Categories is empty");
     }
@@ -112,12 +115,16 @@ const Addproducts = () => {
   const saveCategory = async () => {
     try {
       if (category_name) {
-        setCategoryModal(() => false);
+        const res = await axios.post(
+          `${BASE_URL}/api/category/postCategoryFromAnyPage`,
+          { category_name }
+        );
+        setCategoryModal((prevState) => false);
         toast.success(`category save successfully`);
         fetchAllCategory();
         resetCategory();
       } else {
-        setCategoryModal(() => false);
+        setCategoryModal((prevState) => false);
         toast.error(`Can't post empty category!`);
       }
     } catch (error) {
@@ -128,12 +135,16 @@ const Addproducts = () => {
   const updateCategory = async () => {
     try {
       if (category_name && category_id) {
-        setCategoryModal(() => false);
+        const res = await axios.put(
+          `${{ BASE_URL }}/api/category/updateCategoryFromAnyPage`,
+          { category_name, category_id }
+        );
+        setCategoryModal((prevState) => false);
         toast.success(`category updated successfully`);
         fetchAllCategory();
         resetCategory();
       } else {
-        setCategoryModal(() => false);
+        setCategoryModal((prevState) => false);
         toast.error(`Can't update empty category!`);
       }
     } catch (error) {
@@ -145,6 +156,10 @@ const Addproducts = () => {
   const handleCategoryDeleteTrue = async () => {
     try {
       if (category_id) {
+        const res = await axios.delete(
+          `${BASE_URL}/api/category/deleteCategoryFromAnyPage`,
+          { data: { category_id } }
+        );
         setCategoryModal(false);
         toast.success(`category deleted successfully`);
         fetchAllCategory();
@@ -162,9 +177,7 @@ const Addproducts = () => {
   //get all racks:
   const getAllRack = async () => {
     try {
-      const { data } = await axios.get(
-        "https://backendofsupershoppos.onrender.com/api/rack/getAll"
-      );
+      const { data } = await axios.get(`${BASE_URL}/api/rack/getAll`);
       setRacks(data);
     } catch (error) {
       console.log(error);
@@ -176,7 +189,7 @@ const Addproducts = () => {
   //rack Handling:
   const handleRackSelect = (value) => {
     if (racks && racks.length > 0) {
-      const selectedRack = racks.find((r) => r.rack_id === value);
+      const selectedRack = racks.find((r) => r.rack_id == value);
       if (selectedRack) {
         setRackId(selectedRack.rack_id);
         setRackNo(selectedRack.rack_no);
@@ -192,13 +205,16 @@ const Addproducts = () => {
   const saveRack = async () => {
     try {
       if (rack_no) {
-        setRackModal(() => false);
+        const res = await axios.post(
+          `${BASE_URL}/api/rack/postRackFromAnyPage`,
+          { rack_no }
+        );
+        setRackModal((prevState) => false);
         toast.success(`rack save successfully`);
         getAllRack();
         resetRack();
-
       } else {
-        setCategoryModal(() => false);
+        setCategoryModal((prevState) => false);
         toast.error(`Can't post empty rack!`);
       }
     } catch (error) {
@@ -207,30 +223,33 @@ const Addproducts = () => {
   };
   //update rack
   const updateRack = async () => {
-    // try {
-    //   if (rack_no && rack_id) {
-    //     const res = await axios.put(
-    //       "http://194.233.87.22:5003/api/rack/updateRackFromAnyPage",
-    //       { rack_no, rack_id }
-    //     );
-    //     setRackModal((prevState) => false);
-    //     toast.success(`rack updated successfully`);
-    //     getAllRack();
-    //     resetRack();
-    //   } else {
-    //     setCategoryModal((prevState) => false);
-    //     toast.error(`Can't update empty rack!`);
-    //   }
-    // } catch (error) {
-    //   console.log(error.message);
-    // }
-    toast("Updated button is updated")
+    try {
+      if (rack_no && rack_id) {
+        const res = await axios.put(
+          `${BASE_URL}/api/rack/updateRackFromAnyPage`,
+          { rack_no, rack_id }
+        );
+        setRackModal((prevState) => false);
+        toast.success(`rack updated successfully`);
+        getAllRack();
+        resetRack();
+      } else {
+        setCategoryModal((prevState) => false);
+        toast.error(`Can't update empty rack!`);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   //rack delete functionality:
   const handleRackDeleteTrue = async () => {
     try {
       if (rack_id) {
+        const res = await axios.delete(
+          `${BASE_URL}/api/rack/deleteRackFromAnyPage`,
+          { data: { rack_id } }
+        );
         setRackModal(false);
         toast.success(`rack ${rack_id} deleted successfully`);
         getAllRack();
@@ -299,7 +318,7 @@ const Addproducts = () => {
         if (!existingProductName) {
           console.log(image_blob);
           const res = await axios.post(
-            "https://backendofsupershoppos.onrender.com/api/producttraces/postProductTraceFromAnyPage",
+            `${BASE_URL}/api/producttraces/postProductTraceFromAnyPage`,
             {
               category_id,
               rack_id,
@@ -329,6 +348,19 @@ const Addproducts = () => {
       if (!product_trace_id) {
         toast.error(`Can't update without product_trace_id !`);
       } else {
+        const res = await axios.put(
+          `${BASE_URL}/api/producttraces/updateProductTraceFromAnyPage`,
+          {
+            product_trace_id,
+            category_id,
+            rack_id,
+            product_code,
+            name,
+            type,
+            model,
+            image_blob,
+          }
+        );
         toast.success(`product updated successfully`);
         fetchAllProducts();
         resetAll();
@@ -341,6 +373,10 @@ const Addproducts = () => {
   //product delete functionality=================:
   const handleProductDeleteTrue = async () => {
     try {
+      const res = await axios.delete(
+        `${BASE_URL}/api/producttraces/deleteProductTraceFromAnyPage`,
+        { data: { product_trace_id } }
+      );
       setProductModal(false);
       toast.success(`${product_trace_id}Product deleted successfully`);
       fetchAllProducts();
@@ -738,8 +774,8 @@ const Addproducts = () => {
                             >
                               <img
                                 src={image_blob}
-                                alt=""
-                                className={`${styles.img} ${styles.img_responsive}`} 
+                                alt="product image"
+                                className={`${styles.img} ${styles.img_responsive}`}
                               />
                               {/* <button
                                 className={`${styles.btn} ${styles.uploadBtn}`}

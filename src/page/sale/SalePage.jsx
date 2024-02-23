@@ -25,7 +25,7 @@ const SalePage = () => {
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
-const Employee = localStorage.getItem("username")
+  const Employee = localStorage.getItem("username");
   const [contributor_name, setContributorName] = useState("");
   const [address, setAddress] = useState("");
   const [mobile, setMobile] = useState("");
@@ -44,12 +44,11 @@ const Employee = localStorage.getItem("username")
   const [VAT, setVAT] = useState(null);
   const [paymentTypeData, setPaymentTypeData] = useState([]);
   const [customerData, setCustomer] = useState([]);
-  const [VatData,setVatData] = useState([])
+  const [VatData, setVatData] = useState([]);
   const [saveData, setSaveData] = useState([]);
   const [vatID, setVatID] = useState("");
-  const [saleData,setsaleData] = useState([])
-  const [fixData, setFixData] = useState([])
-
+  const [saleData, setsaleData] = useState([]);
+  const [fixData, setFixData] = useState([]);
 
   useEffect(() => {
     if (paymentTypeData && paymentTypeData.length > 0) {
@@ -134,10 +133,10 @@ const Employee = localStorage.getItem("username")
     const generateInvoiceNumber = () => {
       const validInvoiceNumbers = data
         .map((item) => parseInt(item.invoice_no))
-        .filter((number) => !isNaN(number)); 
+        .filter((number) => !isNaN(number));
       if (validInvoiceNumbers.length === 0) {
         setInvoice(1);
-      } else {    
+      } else {
         const maxInvoiceNumber = Math.max(...validInvoiceNumbers);
         setInvoice(maxInvoiceNumber + 1);
       }
@@ -150,28 +149,24 @@ const Employee = localStorage.getItem("username")
     fetchData();
     fetchCustomerData();
     fetchShop();
-    fetchVatData()
+    fetchVatData();
   }, []);
-
 
   useEffect(() => {
     const handleChangeProductCode = () => {
-      
       const result = customerData.find(
         (item) => item.contributor_name === customerName
       );
-      
-      
-        if (result) {
-          setCustomerID(result.contributor_name_id);
-          setCustomerAddress(result.address);
-          setCustomerPhone(result.mobile);
-        } else {
-          setCustomerID("")
-          setCustomerAddress("");
-          setCustomerPhone("");
-        }
-      
+
+      if (result) {
+        setCustomerID(result.contributor_name_id);
+        setCustomerAddress(result.address);
+        setCustomerPhone(result.mobile);
+      } else {
+        setCustomerID("");
+        setCustomerAddress("");
+        setCustomerPhone("");
+      }
     };
     handleChangeProductCode();
   }, [customerName, customerData]);
@@ -292,9 +287,8 @@ const Employee = localStorage.getItem("username")
 
   const due = parseInt(netTotal) - parseInt(paid) || 0;
 
-  const handleReset = ()=>{
+  const handleReset = () => {
     setItems([
-      
       {
         itemCode: "",
         product_name: "",
@@ -308,11 +302,11 @@ const Employee = localStorage.getItem("username")
       },
     ]);
 
-    setCustomerName("")
-    setDiscount("")
-    setPaid("")
-    setVAT(null)
-  }
+    setCustomerName("");
+    setDiscount("");
+    setPaid("");
+    setVAT(null);
+  };
   // const isItemValid = (item) => {
   //   return (
   //     (item.itemCode && item.itemCode.trim() !== "") &&
@@ -326,16 +320,16 @@ const Employee = localStorage.getItem("username")
   //     (item.unit_id && item.unit_id.trim() !== "")
   //   );
   // };
-  
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleSave = async () => {
     if (paid === "") {
       toast.warning("Please fill in all fields before Save the item.");
       return;
     }
-    try { 
-      console.log("update",saveData);
-      
+    try {
+      console.log("update", saveData);
+
       const response = await axios.post(
         "https://backendofsupershoppos.onrender.com/api/transactionsRouter/postTransactionFromAnyPageBulk",
         saveData,
@@ -348,11 +342,10 @@ const Employee = localStorage.getItem("username")
       );
 
       if (response.status === 200) {
-        
         setSaveData([]);
-        handleReset()
-        setDiscount(0)
-        setVAT(null)
+        handleReset();
+        setDiscount(0);
+        setVAT(null);
         toast.success("Data saved successfully!");
       } else {
         toast.error("Failed to save data");
@@ -375,7 +368,7 @@ const Employee = localStorage.getItem("username")
         setContributorName("");
         setAddress("");
         setMobile("");
-        fetchCustomerData()
+        fetchCustomerData();
         toast.success("Customer Add successfully!");
       } else {
         toast.error("Failed to save Supplier");
@@ -394,7 +387,7 @@ const Employee = localStorage.getItem("username")
       tax_id: vatID,
       amount: netTotal,
       authorized_by_id: 1,
-      contributor_name_id: customerID|| null,
+      contributor_name_id: customerID || null,
       operation_type_id: 1,
       date: formattedDate,
       payment_type_id: payment_id,
@@ -406,24 +399,31 @@ const Employee = localStorage.getItem("username")
       purchase_price: 0,
     }));
     setSaveData((prevSaveData) => [...prevSaveData, ...newTransactions]);
-    setFixData(items)
-  }, [items, invoice, vatID, netTotal, customerID, formattedDate, payment_id, shopNameData, paid, Employee]);
+    setFixData(items);
+  }, [
+    items,
+    invoice,
+    vatID,
+    netTotal,
+    customerID,
+    formattedDate,
+    payment_id,
+    shopNameData,
+    paid,
+    Employee,
+  ]);
 
-  useEffect( () => {
+  useEffect(() => {
     const saveDataNotEmpty = saveData.length > 0;
-    
+
     if (saveDataNotEmpty && paid) {
       handleSave();
-      handlePrint()
-     
+      handlePrint();
     }
-   
-    
-  }, [handleSave, handlePrint,saveData,paid]);
+  }, [handleSave, handlePrint, saveData, paid]);
 
   const handleButtonClick = async () => {
     await addTransaction();
-    
   };
   useEffect(() => {
     const handleVatChange = () => {
@@ -435,28 +435,25 @@ const Employee = localStorage.getItem("username")
 
   const handlePaidChange = (e) => {
     const newPaid = parseFloat(e.target.value);
-    
+
     // Return early if netTotal is empty or not defined
-    if (netTotal===0) {
+    if (netTotal === 0) {
       toast.warning("Paid amount cannot exceed Net Total.");
-    
+
       return;
     }
-  
+
     if (newPaid < 0) {
       toast.warning("Paid amount cannot be negative.");
     } else if (newPaid > netTotal) {
-     
-        toast.warning("Paid amount cannot exceed Net Total.");
-    
-    }
-    else{
-      setPaid(newPaid)
+      toast.warning("Paid amount cannot exceed Net Total.");
+    } else {
+      setPaid(newPaid);
     }
   };
   return (
     <div className="full_div_super_shop_sale">
-      <ToastContainer  />
+      <ToastContainer />
       <div className="second_row_div_supershop_sale">
         <div className="container_table_supershop_sale">
           <table border={1} cellSpacing={2} cellPadding={10}>
@@ -480,7 +477,11 @@ const Employee = localStorage.getItem("username")
                         type="text"
                         className="table_input_field"
                         ref={inputRefs.current[rowIndex][colIndex]}
-                        list={getFieldName(colIndex) === "sale_price" ? `sale_prices_${rowIndex}` : ""}
+                        list={
+                          getFieldName(colIndex) === "sale_price"
+                            ? `sale_prices_${rowIndex}`
+                            : ""
+                        }
                         value={item[getFieldName(colIndex)]}
                         onChange={(e) => {
                           const { value } = e.target;
@@ -498,8 +499,9 @@ const Employee = localStorage.getItem("username")
                               const saleData = data.filter(
                                 (product) =>
                                   product.ProductTrace &&
-                                  product.ProductTrace.product_code === value)
-                                  setsaleData(saleData);
+                                  product.ProductTrace.product_code === value
+                              );
+                              setsaleData(saleData);
 
                               updatedItems[rowIndex]["product_name"] =
                                 matchedProduct.ProductTrace.name;
@@ -537,14 +539,17 @@ const Employee = localStorage.getItem("username")
                           handleKeyPress(e, rowIndex, colIndex)
                         }
                       />
-                       {getFieldName(colIndex) === "sale_price" && (
-          <datalist id={`sale_prices_${rowIndex}`}>
-            {/* Populate options with sale prices for the scanned product */}
-            {saleData.map((product) => (
-              <option key={product.product_trace_id} value={product.sale_price} />
-            ))}
-          </datalist>
-        )}
+                      {getFieldName(colIndex) === "sale_price" && (
+                        <datalist id={`sale_prices_${rowIndex}`}>
+                          {/* Populate options with sale prices for the scanned product */}
+                          {saleData.map((product) => (
+                            <option
+                              key={product.product_trace_id}
+                              value={product.sale_price}
+                            />
+                          ))}
+                        </datalist>
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -570,22 +575,23 @@ const Employee = localStorage.getItem("username")
                     onChange={(e) => setCustomerName(e.target.value)}
                     list="list_customer"
                   />
-                    <datalist id="list_customer">
-                      {customerData.length > 0 &&
-                        customerData.map((customer, index) => {
-                          return (
-                            <option key={index} value={customer.contributor_name}>{customer.contributor_name}</option>
-                          );
-                        })}
-                    </datalist>
+                  <datalist id="list_customer">
+                    {customerData.length > 0 &&
+                      customerData.map((customer, index) => {
+                        return (
+                          <option key={index} value={customer.contributor_name}>
+                            {customer.contributor_name}
+                          </option>
+                        );
+                      })}
+                  </datalist>
                 </div>
                 <div className="input_field_supershop_sale">
                   <label>Customer ID</label>
                   <input
-                  type="number"
+                    type="number"
                     style={{ width: "8vw" }}
                     value={customerID}
-                  
                   />
                   <Button style={{ width: "3.5vw" }} onClick={showModal}>
                     +
@@ -593,18 +599,11 @@ const Employee = localStorage.getItem("username")
                 </div>
                 <div className="input_field_supershop_sale">
                   <label>Customer Phone</label>
-                  <input
-                    type="text"
-                    value={customerPhone}
-                    
-                  />
+                  <input type="text" value={customerPhone} />
                 </div>
                 <div className="input_field_supershop_sale">
                   <label>Customer Address</label>
-                  <input type="text"
-                    value={customerAddress}
-                    
-                  />
+                  <input type="text" value={customerAddress} />
                 </div>
               </div>
             </div>
@@ -649,11 +648,7 @@ const Employee = localStorage.getItem("username")
                 </div>
                 <div className="input_field_bottom_supershop_sale">
                   <label>Employee </label>
-                  <input
-                    type="text"
-                    value={Employee}
-                   
-                  />
+                  <input type="text" value={Employee} />
                 </div>
                 <div className="input_field_bottom_supershop_sale">
                   <label>Total</label>
@@ -680,15 +675,15 @@ const Employee = localStorage.getItem("username")
                     list="vat_list"
                   />
                   <datalist id="vat_list">
-                {VatData.length > 0 &&
-                  VatData.map((vat) => {
-                    return (
-                      <option key={vat.tax_id} value={vat.rate}>
-                        {vat.rate}
-                      </option>
-                    );
-                  })}
-              </datalist>
+                    {VatData.length > 0 &&
+                      VatData.map((vat) => {
+                        return (
+                          <option key={vat.tax_id} value={vat.rate}>
+                            {vat.rate}
+                          </option>
+                        );
+                      })}
+                  </datalist>
                 </div>
                 <div className="input_field_bottom_supershop_sale">
                   <label>Net Total</label>
@@ -701,7 +696,6 @@ const Employee = localStorage.getItem("username")
                     value={paid}
                     onChange={handlePaidChange}
                     required
-                    
                   />
                 </div>
                 <div className="input_field_bottom_supershop_sale">
@@ -711,17 +705,15 @@ const Employee = localStorage.getItem("username")
               </div>
               <div className="container_billing_supershop_sale">
                 <div className="button-shadow-supershop-sale">
-                <div style={{ display: "none" }}>
-                <PosInvoice
-                ref={componentRef}
-               
-                discount={discount}
-                VAT= {VAT}
-                fixData={fixData}
-                netTotal={netTotal}
-    
-              />
-              </div>
+                  <div style={{ display: "none" }}>
+                    <PosInvoice
+                      ref={componentRef}
+                      discount={discount}
+                      VAT={VAT}
+                      fixData={fixData}
+                      netTotal={netTotal}
+                    />
+                  </div>
                   <button
                     className="billing_button_supershop_sale"
                     onClick={handleButtonClick}
@@ -733,7 +725,11 @@ const Employee = localStorage.getItem("username")
               </div>
               <div className="container_billing_supershop_sale">
                 <div className="button-shadow-supershop-sale">
-                  <button className="billing_button_supershop_sale" style={{cursor:"pointer"}} onClick={handleReset}>
+                  <button
+                    className="billing_button_supershop_sale"
+                    style={{ cursor: "pointer" }}
+                    onClick={handleReset}
+                  >
                     <img src={reset} alt="billing" />
                   </button>
                 </div>
@@ -765,41 +761,42 @@ const Employee = localStorage.getItem("username")
                   <div>
                     <div className="search_permanent_supplier_supershop">
                       <div className="search_permanent_supplier_supershop_column1">
-                      <div className="input_field_permanent_supplier_supershop">
-                            <label>Supplier Name</label>
-                            <input
-                              type="text"
-                              value={contributor_name}
-                              onChange={(e) =>
-                                setContributorName(e.target.value)
-                              }
-                            />
-                          </div>
+                        <div className="input_field_permanent_supplier_supershop">
+                          <label>Supplier Name</label>
+                          <input
+                            type="text"
+                            value={contributor_name}
+                            onChange={(e) => setContributorName(e.target.value)}
+                          />
                         </div>
-                        <div className="search_permanent_supplier_supershop_column2">
-                          <div className="input_field_permanent_supplier_supershop">
-                            <label>SupplierMobile</label>
-                            <input
-                              type="text"
-                              value={mobile}
-                              onChange={(e) => setMobile(e.target.value)}
-                            />
-                          </div>
-                          <div className="input_field_permanent_supplier_supershop">
-                            <label>SupplierAddress</label>
-                            <input
-                              type="text"
-                              value={address}
-                              onChange={(e) => setAddress(e.target.value)}
-                            />
-                          </div>
+                      </div>
+                      <div className="search_permanent_supplier_supershop_column2">
+                        <div className="input_field_permanent_supplier_supershop">
+                          <label>SupplierMobile</label>
+                          <input
+                            type="text"
+                            value={mobile}
+                            onChange={(e) => setMobile(e.target.value)}
+                          />
                         </div>
+                        <div className="input_field_permanent_supplier_supershop">
+                          <label>SupplierAddress</label>
+                          <input
+                            type="text"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   <div>
                     <div className="save_button">
-                      <button className="button_supershop button2" onClick={handleCustomerSave}>
+                      <button
+                        className="button_supershop button2"
+                        onClick={handleCustomerSave}
+                      >
                         <img src={Save} alt="" />
                       </button>
                       Save
