@@ -23,18 +23,18 @@ const SuperShopLogin = () => {
 
     // Input validation End
     localStorage.setItem("username", userName);
-    if (!userName === userName && !password === password)
-      try {
+    try {
+      if (!userName === userName && !password === password)
         navigate("/home", {
           state: {
             username: userName,
             password: password,
           },
         });
-      } catch (error) {
-        console.error("Error saving data:" + error);
-        toast("Error sending data: " + error);
-      }
+    } catch (error) {
+      console.error("Error saving data:" + error);
+      toast("Error sending data: " + error);
+    }
   };
 
   return (
